@@ -1,0 +1,31 @@
+#Cozzy
+
+# Define the root directory
+$root_dir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+# Confirmation prompt
+$confirmation = Read-Host "Are you sure you want to run this script? Every subdirectory will be sorted and have a RAW folder created within. Ensure this script is running in the photo root folder ONLY. (Y/N)"
+if ($confirmation -ne "Y") {
+    Write-Host "Script execution cancelled."
+    exit
+}
+
+# Traverse the directory tree
+Get-ChildItem $root_dir -Recurse -Directory | ForEach-Object {
+    $subdir_name = $_.Name
+    if (($subdir_name -notlike "RAW*") -and ($subdir_name -notlike "RAW")) {
+        $raw_folder = Join-Path $_.FullName "RAW"
+        if (!(Test-Path $raw_folder)) {
+            New-Item -ItemType Directory -Path $raw_folder | Out-Null
+        }
+
+        # Move any .ARW files to the RAW folder
+        Get-ChildItem $_.FullName -Filter *.ARW | ForEach-Object {
+            $src = $_.FullName
+            $dst = Join-Path $raw_folder $_.Name
+            if (!(Test-Path $dst)) {
+                Move-Item $src $dst
+            }
+        }
+    }
+}
