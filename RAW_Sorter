@@ -1,5 +1,3 @@
-#Cozzy
-
 # Define the root directory
 $root_dir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -15,16 +13,19 @@ Get-ChildItem $root_dir -Recurse -Directory | ForEach-Object {
     $subdir_name = $_.Name
     if (($subdir_name -notlike "RAW*") -and ($subdir_name -notlike "RAW")) {
         $raw_folder = Join-Path $_.FullName "RAW"
-        if (!(Test-Path $raw_folder)) {
-            New-Item -ItemType Directory -Path $raw_folder | Out-Null
-        }
+        $arw_files = Get-ChildItem $_.FullName -Filter *.ARW
+        if ($arw_files.Count -gt 0) {
+            if (!(Test-Path $raw_folder)) {
+                New-Item -ItemType Directory -Path $raw_folder | Out-Null
+            }
 
-        # Move any .ARW files to the RAW folder
-        Get-ChildItem $_.FullName -Filter *.ARW | ForEach-Object {
-            $src = $_.FullName
-            $dst = Join-Path $raw_folder $_.Name
-            if (!(Test-Path $dst)) {
-                Move-Item $src $dst
+            # Move any .ARW files to the RAW folder
+            foreach ($arw_file in $arw_files) {
+                $src = $arw_file.FullName
+                $dst = Join-Path $raw_folder $arw_file.Name
+                if (!(Test-Path $dst)) {
+                    Move-Item $src $dst
+                }
             }
         }
     }
