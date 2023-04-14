@@ -7,6 +7,7 @@ Starting from the directory in which the script is placed, RAW sorter creates a 
 
 
 How to Use it-
+As a powershell script, no compiling necessary. Copy the code and paste into a text editor- save as a *.ps1 file
 Place it in the root directory of your photo directory tree
 Right click > Run in Powershell
 Follow the prompt
